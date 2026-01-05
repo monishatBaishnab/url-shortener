@@ -5,8 +5,8 @@ import { config } from './app/config/index.js';
 let server: Server;
 
 const main = async () => {
-  server = app.listen(config.port, () => {
-    console.log('Server Running on port: ', config.port);
+  server = app.listen(config.PORT, () => {
+    console.log('Server Running on port: ', config.PORT);
   });
 };
 

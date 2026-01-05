@@ -5,6 +5,7 @@ import type { Application } from 'express-serve-static-core';
 import httpStatus from 'http-status';
 import GlobalError from './app/middlewares/GlobalError.js';
 import NotFound from './app/middlewares/NotFound.js';
+import { AppRoutes } from './app/routes/index.js';
 import catchAsync from './app/utils/catchAsync.js';
 import sendResponse from './app/utils/sendResponse.js';
 
@@ -20,7 +21,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    // origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173'],
   }),
 );
 
@@ -31,11 +32,14 @@ app.get(
   catchAsync((req, res) => {
     sendResponse(res, {
       success: true,
-      status: httpStatus.OK,
+      statusCode: httpStatus.OK,
       message: 'Server Running Smoothly.',
+      data: null,
     });
   }),
 );
+
+app.use('/api/v1/', AppRoutes);
 
 // Middleware to handle 404 (Not Found) errors
 app.use(/.*/, NotFound);

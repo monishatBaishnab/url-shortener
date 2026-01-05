@@ -1,11 +1,13 @@
-import env from "dotenv";
-import path from "path";
+import env from 'dotenv';
+import path from 'path';
 
-env.config({ path: path.join(process.cwd(), ".env") });
+env.config({ path: path.join(process.cwd(), '.env') });
 
 export const config = {
-  port: process.env.PORT || 3000,
-  bcrypt_salt: process.env.BCRYPT_SALT,
-  jwt_secret: process.env.JWT_SECRET,
-  node_env: process.env.NODE_ENV,
+  PORT: process.env.PORT || 3000,
+  BCRYPT_SALT: process.env.BCRYPT_SALT,
+  JWT_SECRET: process.env.JWT_SECRET,
+  NODE_ENV: process.env.NODE_ENV,
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
 };
