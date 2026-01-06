@@ -1,7 +1,7 @@
-import Login from '@/pages/Login';
+import ForgotPass from '@/pages/ForgotPass';
 import NotFound from '@/pages/NotFound';
-import Register from '@/pages/Register';
-import ResetPass from '@/pages/ResetPass';
+import SignIn from '@/pages/SignIn';
+import SignUp from '@/pages/SignUp';
 import URLShortener from '@/pages/URLShortener';
 
 export const PROTECTED_ROUTES = [
@@ -17,15 +17,15 @@ export const PUBLIC_ROUTES = [
     element: NotFound,
   },
   {
-    path: '/login',
-    element: Login,
+    path: '/sign-in',
+    element: SignIn,
   },
   {
-    path: '/register',
-    element: Register,
+    path: '/sign-up',
+    element: SignUp,
   },
   {
-    path: '/reset-password',
-    element: ResetPass,
+    path: '/forgot-password',
+    element: ForgotPass,
   },
 ];

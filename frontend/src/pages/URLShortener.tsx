@@ -1,5 +1,13 @@
+import { Button } from '@/components/ui/button';
+import useAuth from '@/hooks/useAuth';
+
 const URLShortener = () => {
-  return <div>Url Shortener</div>;
+  const { logout } = useAuth();
+  return (
+    <div className="flex items-center justify-center">
+      <Button onClick={logout}>Logout</Button>
+    </div>
+  );
 };
 
 export default URLShortener;

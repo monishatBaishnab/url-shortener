@@ -5,7 +5,8 @@ export type TTagTypes = (typeof API_TAGS)[keyof typeof API_TAGS];
 
 export const API_URL = {
   // ------ Auth URL's ------
-  login: '/auth/sign-in',
+  login: '/auth/login',
+  register: '/auth/register',
   verifyOtp: '/auth/verify-otp',
   refreshToken: '/auth/refresh-token',
   resetPassword: '/auth/reset-password',
