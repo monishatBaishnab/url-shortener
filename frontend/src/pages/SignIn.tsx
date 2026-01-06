@@ -38,8 +38,8 @@ const SignIn = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'monishat.baishnab@example.com',
-      password: '12345678',
+      email: 'monishat@baishnab.com',
+      password: '123456',
     },
   });
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
@@ -12,6 +13,7 @@ const buttonVariants = cva(
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         primary: 'bg-cornflower-blue-400 hover:bg-cornflower-blue-500/85 active:bg-cornflower-blue-400 text-white',
         link: 'text-primary underline-offset-4 hover:underline',
+        ghost: 'bg-transparent text-foreground hover:bg-muted hover:text-foreground',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

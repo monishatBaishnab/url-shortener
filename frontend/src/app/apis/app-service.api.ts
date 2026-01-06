@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { APP_URL } from '@/config/config';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_TAGS } from '../app.constants';
@@ -6,7 +7,7 @@ export const appServiceApi = createApi({
   reducerPath: 'app-service-api',
   baseQuery: async (args, api, extraOptions) => {
     const baseQuery = fetchBaseQuery({
-      baseUrl: APP_URL,
+      baseUrl: `${APP_URL}/api/v1`,
       prepareHeaders: async (headers, { getState }) => {
         const token = (getState() as any)?.auth?.accessToken;
         const defaultHeader: Headers = headers;

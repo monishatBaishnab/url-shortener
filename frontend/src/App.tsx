@@ -1,11 +1,22 @@
 import { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
+import { useGetProfileInfoQuery } from './app/features/auth/auth.api';
 import AuthGuard from './components/AuthGuard';
+import useAuth from './hooks/useAuth';
 import Loading from './pages/Loading';
 import NotFound from './pages/NotFound';
 import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './routes/routes';
 
 const App = () => {
+  const { accessToken } = useAuth();
+  const { isLoading } = useGetProfileInfoQuery(undefined, {
+    skip: !accessToken,
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <main>
       <Routes>

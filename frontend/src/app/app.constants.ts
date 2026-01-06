@@ -1,5 +1,6 @@
 export const API_TAGS = {
   GET_ME: 'get-me',
+  GET_LINKS: 'get-links',
 } as const;
 export type TTagTypes = (typeof API_TAGS)[keyof typeof API_TAGS];
 
@@ -12,5 +13,10 @@ export const API_URL = {
   resetPassword: '/auth/reset-password',
   changePassword: '/auth/change-password',
   forgotPassword: '/auth/forgot-password',
-  getProfileInfo: '/auth/get-me',
+  getProfileInfo: '/auth/me',
+
+  // ------ Link URL's ------
+  createLink: '/links',
+  getAllLinks: '/links',
+  deleteLink: '/links',
 };

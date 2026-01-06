@@ -96,6 +96,7 @@ export const authApi = appServiceApi.injectEndpoints({
 export const {
   useLoginMutation,
   useForgotPasswordMutation,
+  useGetProfileInfoQuery,
   useVerifyOtpMutation,
   useResetPasswordMutation,
   useRegisterMutation,

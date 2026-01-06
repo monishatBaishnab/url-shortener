@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -49,6 +50,17 @@ const ForgotPass = () => {
   );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // Initialize timer based on step
+  const getInitialTime = () => {
+    const currentStep = Number(localStorage.getItem('forgot-pass-step') || 1);
+    if (currentStep === 2) {
+      const storedTime = localStorage.getItem('forgot-pass-timer');
+      return storedTime ? parseInt(storedTime) : 300; // 5 minutes = 300 seconds
+    }
+    return 0;
+  };
+
+  const [timeLeft, setTimeLeft] = useState<number>(getInitialTime);
 
   const [forgotPassword, { isLoading: isSendingEmail }] =
     useForgotPasswordMutation();
@@ -72,12 +84,53 @@ const ForgotPass = () => {
     defaultValues: { new_password: '', confirm_password: '' },
   });
 
+  // Format time as HH:MM
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+      .toString()
+      .padStart(2, '0')}`;
+  };
+
+  // Update timer when step changes
+  useEffect(() => {
+    if (step === 2) {
+      const storedTime = localStorage.getItem('forgot-pass-timer');
+      const initialTime = storedTime ? parseInt(storedTime) : 300;
+      setTimeLeft(initialTime);
+    } else {
+      setTimeLeft(0);
+    }
+  }, [step]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    let interval: number;
+
+    if (step === 2 && timeLeft > 0) {
+      interval = window.setInterval(() => {
+        setTimeLeft((prevTime) => {
+          const newTime = prevTime - 1;
+          localStorage.setItem('forgot-pass-timer', String(newTime));
+          return newTime;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [step, timeLeft]);
+
+  // Save step and timer to localStorage
   useEffect(() => {
     if (step) {
       localStorage.setItem('forgot-pass-step', String(step));
     }
     return () => {
       localStorage.removeItem('forgot-pass-step');
+      localStorage.removeItem('forgot-pass-timer');
     };
   }, [step]);
 
@@ -102,6 +155,9 @@ const ForgotPass = () => {
       const email = emailForm.getValues('email');
       await verifyOtpMutation({ email, otp: data.otp }).unwrap();
       toast.success('OTP verified successfully.');
+      // Reset timer on successful verification
+      setTimeLeft(0);
+      localStorage.removeItem('forgot-pass-timer');
       setStep(3);
     } catch (error) {
       const message = getErrorMessage(error, 'Invalid OTP. Please try again.');
@@ -172,6 +228,9 @@ const ForgotPass = () => {
           className="space-y-4"
           onSubmit={otpForm.handleSubmit(handleOtpSubmit)}
         >
+          <div className="text-center text-sm text-gray-600 mb-4">
+            Enter the 4-digit code sent to your email
+          </div>
           <div className="space-y-1 pt-1">
             <Controller
               control={otpForm.control}
@@ -208,16 +267,61 @@ const ForgotPass = () => {
             ) : (
               <p className="h-3"></p>
             )}
+            {timeLeft > 0 ? (
+              <p className="text-xs text-gray-600 text-center mt-2">
+                Time remaining:{' '}
+                <span className="font-medium text-blue-600">
+                  {formatTime(timeLeft)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-xs text-red-600 text-center mt-2">
+                Time expired. Please request a new OTP.
+              </p>
+            )}
           </div>
           <Button
             className="w-full"
             size="lg"
             type="submit"
             variant={'primary'}
-            disabled={isVerifyingOtp}
+            disabled={isVerifyingOtp || timeLeft === 0}
           >
-            {isVerifyingOtp ? 'Verifying...' : 'Verify OTP'}
+            {isVerifyingOtp
+              ? 'Verifying...'
+              : timeLeft === 0
+              ? 'OTP Expired'
+              : 'Verify OTP'}
           </Button>
+
+          {timeLeft === 0 && (
+            <Button
+              className="w-full mt-2"
+              size="default"
+              variant="ghost"
+              onClick={async () => {
+                try {
+                  // Reset timer
+                  setTimeLeft(300);
+                  localStorage.setItem('forgot-pass-timer', '300');
+
+                  // Resend OTP
+                  const email = emailForm.getValues('email');
+                  await forgotPassword({ email }).unwrap();
+                  toast.success('OTP sent to your email.');
+                } catch (error) {
+                  const message = getErrorMessage(
+                    error,
+                    'Failed to resend OTP.',
+                  );
+                  toast.error(message);
+                }
+              }}
+              disabled={isSendingEmail}
+            >
+              {isSendingEmail ? 'Resending...' : 'Resend OTP'}
+            </Button>
+          )}
         </form>
       );
     }
@@ -322,21 +426,27 @@ const ForgotPass = () => {
           <div className="flex justify-center gap-2 text-xs font-medium text-gray-600">
             <div
               className={`px-3 py-1 rounded-full ${
-                step === 1 ? 'bg-cornflower-blue-50 text-cornflower-blue-400' : 'bg-gray-100'
+                step === 1
+                  ? 'bg-cornflower-blue-50 text-cornflower-blue-400'
+                  : 'bg-gray-100'
               }`}
             >
               1. Email
             </div>
             <div
               className={`px-3 py-1 rounded-full ${
-                step === 2 ? 'bg-cornflower-blue-50 text-cornflower-blue-400' : 'bg-gray-100'
+                step === 2
+                  ? 'bg-cornflower-blue-50 text-cornflower-blue-400'
+                  : 'bg-gray-100'
               }`}
             >
               2. Verify OTP
             </div>
             <div
               className={`px-3 py-1 rounded-full ${
-                step === 3 ? 'bg-cornflower-blue-50 text-cornflower-blue-400' : 'bg-gray-100'
+                step === 3
+                  ? 'bg-cornflower-blue-50 text-cornflower-blue-400'
+                  : 'bg-gray-100'
               }`}
             >
               3. New password
