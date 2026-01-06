@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import type { Application } from 'express-serve-static-core';
 import httpStatus from 'http-status';
+import prismaClient from './app/lib/prisma.js';
 import GlobalError from './app/middlewares/GlobalError.js';
 import NotFound from './app/middlewares/NotFound.js';
 import { AppRoutes } from './app/routes/index.js';
@@ -21,7 +22,10 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:5173'],
+    origin: [
+      'http://localhost:5173',
+      'https://url-shortener-sandy-three.vercel.app',
+    ],
   }),
 );
 
@@ -36,6 +40,28 @@ app.get(
       message: 'Server Running Smoothly.',
       data: null,
     });
+  }),
+);
+
+// Redirect to the original URL
+app.get(
+  '/:key',
+  catchAsync(async (req, res) => {
+    const { key } = req.params;
+    const link = await prismaClient.link.findFirst({
+      where: {
+        keyword: key as string,
+        is_deleted: false,
+      },
+    });
+
+    if (link) {
+      await prismaClient.link.update({
+        where: { id: link.id },
+        data: { clicks: { increment: 1 } },
+      });
+      res.redirect(link.original_url);
+    }
   }),
 );
 

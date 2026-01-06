@@ -14,7 +14,7 @@ const GlobalError = (
   const success: boolean = false;
   let status: number = err?.statusCode || httpStatus.BAD_REQUEST;
   let message: string = err?.name || 'Something want wrong.';
-
+console.log(err);
   if (err instanceof ZodError) {
     message = 'Validation failed, check the input data for errors.';
   } else if (err instanceof PrismaClientKnownRequestError) {

@@ -8,7 +8,8 @@
     "start": "node ./dist/server.js",
     "dev": "nodemon ./dist/server.js",
     "prod": "NODE_ENV=production node ./dist/server.js",
-    "migrate": "npx prisma migrate dev"
+    "migrate": "npx prisma migrate dev",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",

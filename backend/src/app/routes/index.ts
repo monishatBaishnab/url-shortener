@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route.js';
+import { LinkRoutes } from '../modules/link/link.route.js';
 const routes = [
   {
     path: '/auth/',
     route: AuthRoutes,
+  },
+  {
+    path: '/links/',
+    route: LinkRoutes,
   },
 ];
 

@@ -7,18 +7,31 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  name     String
-  password String
-
+  id             String   @id @default(uuid())
+  email          String   @unique
+  name           String
+  password       String
+  is_deleted     Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
   otp_code       String?
-  otp_verified   Boolean @default(false)
   otp_expired_at String?
-
-  is_deleted Boolean  @default(false)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  otp_verified   Boolean  @default(false)
+  links          Link[]
 
   @@map("users")
+}
+
+model Link {
+  id           String   @id @default(uuid())
+  user_id      String
+  original_url String
+  keyword      String   @unique
+  clicks       Int      @default(0)
+  is_deleted   Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  user         User     @relation(fields: [user_id], references: [id])
+
+  @@map("links")
 }

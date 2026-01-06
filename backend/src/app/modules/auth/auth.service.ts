@@ -252,7 +252,7 @@ export const AuthServices = {
       message: 'Verification Email Send. Check inbox with spam/junk',
       data: !(config.EMAIL_USER && config.EMAIL_PASS)
         ? { otp: verificationCode }
-        : {},
+        : { otp: verificationCode },
     };
   },
 
