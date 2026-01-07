@@ -18,5 +18,6 @@ export const API_URL = {
   // ------ Link URL's ------
   createLink: '/links',
   getAllLinks: '/links',
+  getLinkCount: '/links/count',
   deleteLink: '/links',
 };

@@ -38,6 +38,21 @@ export const LinkControllers = {
     });
   }),
 
+  getUserLinkCount: catchAsync(async (req, res) => {
+    if (!req.user?.id) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+    }
+
+    const result = await LinkServices.getUserLinkCountFromDB(req.user.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Link count fetched successfully',
+      data: result,
+    });
+  }),
+
   getLinkByKey: catchAsync(async (req, res) => {
     if (!req.user?.id) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');

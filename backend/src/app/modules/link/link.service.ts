@@ -10,6 +10,20 @@ interface CreateLinkPayload {
 
 export const LinkServices = {
   createLinkIntoDB: async (payload: CreateLinkPayload) => {
+    // Check if user has reached the 100 link limit (count all links including deleted)
+    const userTotalLinkCount = await prismaClient.link.count({
+      where: {
+        user_id: payload.user_id,
+      },
+    });
+
+    if (userTotalLinkCount >= 100) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have reached the maximum limit of 100 shortened links. Please upgrade your account to create more links.',
+      );
+    }
+
     // Generate unique short code
     const keyword = await generateUniqueShortCode();
 
@@ -53,6 +67,17 @@ export const LinkServices = {
     });
 
     return links;
+  },
+
+  getUserLinkCountFromDB: async (user_id: string) => {
+    // Count all links created by user (including deleted ones)
+    const totalCount = await prismaClient.link.count({
+      where: {
+        user_id,
+      },
+    });
+
+    return { totalCount };
   },
 
   getLinkByKeyFromDB: async (keyword: string, user_id: string) => {

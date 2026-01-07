@@ -2,6 +2,7 @@ import {
   useCreateLinkMutation,
   useDeleteLinkMutation,
   useGetAllLinksQuery,
+  useGetLinkCountQuery,
 } from '@/app/features/shortener/shortener.api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,10 +15,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { APP_URL } from '@/config/config';
 import useAuth from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/error';
-import { Copy, Link2Icon, LogOut, Trash2 } from 'lucide-react';
+import { Copy, Link2Icon, LogOut, Trash2, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -28,10 +34,15 @@ const URLShortener = () => {
   const [createLink, { isLoading: isCreating }] = useCreateLinkMutation();
   const [deleteLink, { isLoading: isDeleting }] = useDeleteLinkMutation();
   const { data: linksData, isLoading: isLoadingLinks } = useGetAllLinksQuery();
+  const { data: countData } = useGetLinkCountQuery();
+
+  const links = linksData?.data || [];
+  const totalLinkCount = countData?.data?.totalCount || 0;
+  const hasReachedLimit = totalLinkCount >= 100;
 
   const handleCreateLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputUrl.trim()) return;
+    if (!inputUrl.trim() || hasReachedLimit) return;
 
     try {
       await createLink({ original_link: inputUrl }).unwrap();
@@ -75,8 +86,6 @@ const URLShortener = () => {
     });
   };
 
-  const links = linksData?.data || [];
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -106,31 +115,59 @@ const URLShortener = () => {
           className="mt-10 flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200"
         >
           <Input
-            placeholder="Enter the link here"
+            placeholder={
+              hasReachedLimit
+                ? "You've reached the 100 link limit"
+                : 'Enter the link here'
+            }
             className="flex-1"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            disabled={isCreating}
+            disabled={isCreating || hasReachedLimit}
           />
           <Button
             type="submit"
             size="lg"
             className="bg-linear-to-r from-indigo-500 to-purple-500 text-white h-11"
-            disabled={isCreating || !inputUrl.trim()}
+            disabled={isCreating || !inputUrl.trim() || hasReachedLimit}
           >
-            {isCreating ? 'Shortening...' : 'Shorten Now!'}
+            {isCreating
+              ? 'Shortening...'
+              : hasReachedLimit
+              ? 'Limit Reached'
+              : 'Shorten Now!'}
           </Button>
         </form>
 
-        <div className="mt-4 flex items-center justify-center text-sm text-muted-foreground">
-          <span>
-            You have created{' '}
-            <strong className="text-blue-600">{links.length}</strong> link
-            {links.length !== 1 ? 's' : ''}. You can add up to{' '}
-            <strong className="text-blue-600">{100 - links.length}</strong>{' '}
-            additional links.
-          </span>
-        </div>
+        {hasReachedLimit ? (
+          <div className="mt-4 p-4 bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+            <div className="flex justify-center text-amber-800 mb-2">
+              <TriangleAlert />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-amber-800">
+                  Link Limit Reached
+                </h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  You have reached the maximum limit of 100 shortened links.{' '}
+                  <br className="hidden md:block" /> Please upgrade your account
+                  to create more links.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 flex items-center justify-center text-sm text-muted-foreground">
+            <span>
+              You have created{' '}
+              <strong className="text-blue-600">{totalLinkCount}</strong> link
+              {totalLinkCount !== 1 ? 's' : ''}. You can add up to{' '}
+              <strong className="text-blue-600">{100 - totalLinkCount}</strong>{' '}
+              additional links.
+            </span>
+          </div>
+        )}
       </section>
 
       {/* Table */}
@@ -187,11 +224,11 @@ const URLShortener = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell
-                      className="truncate max-w-xs"
-                      title={link.original_url}
-                    >
-                      {link.original_url}
+                    <TableCell>
+                      <Tooltip>
+                        <TooltipTrigger><span className="block truncate max-w-xs">{link.original_url}</span></TooltipTrigger>
+                        <TooltipContent>{link.original_url}</TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="text-center">{link.clicks}</TableCell>
                     <TableCell>

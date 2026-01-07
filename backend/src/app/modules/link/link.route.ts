@@ -26,6 +26,13 @@ router.post(
 router.get('/', authenticate, LinkControllers.getAllLinks);
 
 /**
+ * @route   GET /api/v1/links/count
+ * @desc    Get total count of links created by user (including deleted)
+ * @access  Private
+ */
+router.get('/count', authenticate, LinkControllers.getUserLinkCount);
+
+/**
  * @route   GET /api/v1/links/key/:key
  * @desc    Get a single link by short code (keyword)
  * @access  Private

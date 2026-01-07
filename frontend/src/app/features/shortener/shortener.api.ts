@@ -22,6 +22,15 @@ export const shortenerApi = appServiceApi.injectEndpoints({
       }),
       providesTags: [{ type: API_TAGS.GET_LINKS }],
     }),
+    getLinkCount: builder.query<
+      CommonResponse<{ totalCount: number }>,
+      void
+    >({
+      query: () => ({
+        url: API_URL.getLinkCount,
+      }),
+      providesTags: [{ type: API_TAGS.GET_LINKS }],
+    }),
     deleteLink: builder.mutation<
       CommonResponse<{ message: string }>,
       { linkId: string }
@@ -38,5 +47,6 @@ export const shortenerApi = appServiceApi.injectEndpoints({
 export const {
   useCreateLinkMutation,
   useGetAllLinksQuery,
+  useGetLinkCountQuery,
   useDeleteLinkMutation,
 } = shortenerApi;
