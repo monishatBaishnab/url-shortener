@@ -48,8 +48,8 @@ VITE_NODE_ENV=development
 1. **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
-   cd url-shortener-service
+   git clone https://github.com/monishatBaishnab/url-shortener
+   cd url-shortener
    ```
 
 2. **Backend Setup:**
